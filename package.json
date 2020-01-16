@@ -1,11 +1,8 @@
 {
     "scripts": {
-        "dev": "next",
+        "dev": "node server.js",
         "build": "next build",
-        "start": "next start",
-        "serve-dev": "node server.js",
-        "serve-build": "next build",
-        "serve-start": "NODE_ENV=production node server.js"
+        "start": "NODE_ENV=production node server.js"
     },
     "devDependencies": {
         "@types/node": "^13.1.7",
