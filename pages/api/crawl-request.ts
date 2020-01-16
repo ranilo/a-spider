@@ -8,8 +8,7 @@ interface CrawlRequest {
 
 const URL_REGEX = 'http.*://[^?]*'
 
-function isValid(bodyPayload: string): CrawlRequest {
-    const  body = JSON.parse(bodyPayload);
+function isValid(body: any): CrawlRequest {
     let res = {
         maxDepth: 0,
         maxPage: 0,
@@ -42,7 +41,7 @@ function isValid(bodyPayload: string): CrawlRequest {
 export default async (req, res) => {
     const body = JSON.parse(req.body);
     if (req.method === 'POST') {
-        let validRequest = isValid(req.body);
+        let validRequest = isValid(body);
         if (validRequest.error.length > 0) {
             return res.status(400).json({
                 ok: false,

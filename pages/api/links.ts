@@ -1,5 +1,4 @@
 import fetch from 'isomorphic-unfetch';
-import { parse } from 'node-html-parser';
 
 const links = async (request: RequestInfo): Promise<any> => {
     return new Promise((resolve, reject) => {

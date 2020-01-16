@@ -1,18 +1,16 @@
 import fetch from 'unfetch'
 import useSWR from 'swr'
-import { ok } from 'assert';
-
 
 const API_URL = '/api/'
-async function fetcher(path) {
-  const data = { path: path };
-  const res = await fetch(API_URL+"links", {
-    method: 'POST',
-    body: JSON.stringify(data)
-  })
-  const json = await res.json()
-  return json
-}
+// async function fetcher(path) {
+//   const data = { path: path };
+//   const res = await fetch(API_URL+"links", {
+//     method: 'POST',
+//     body: JSON.stringify(data)
+//   })
+//   const json = await res.json()
+//   return json
+// }
 
 async function crawl(path){
   const data = {uri: path,  maxDepth: 2, maxPage: 3};
