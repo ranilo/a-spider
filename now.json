@@ -1,0 +1,6 @@
+{
+    "env":{
+        "MAX_DEPTH_LIMIT": "@max_depth_limit",
+        "MAX_PAGE_LIMIT": "@max_page_limit"
+    }
+}

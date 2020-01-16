@@ -39,10 +39,5 @@ export default async (req, res) => {
             path: body.path,
             links: await links(body.path)
         })
-    } else {
-        res.status(404).json({
-            ok: false,
-            message: "method not found"
-        })
     }
 }
