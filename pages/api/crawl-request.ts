@@ -1,40 +1,37 @@
-// crawl-request
+// crawl-request.ts
 interface CrawlRequest {
-    valid: Boolean,
     url: String,
     maxDepth: Number,
     maxPage: Number,
-    error: String
+    error: Array<String>
 }
 
-const URL_REGEX = '#\b(([\w-]+://?|www[.])[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/)))#iS';
+const URL_REGEX = 'http.*://[^?]*'
 
-function isValid(body: any): CrawlRequest {
+function isValid(bodyPayload: string): CrawlRequest {
+    const  body = JSON.parse(bodyPayload);
     let res = {
-        valid: false,
         maxDepth: 0,
         maxPage: 0,
         url: null,
-        error: ""
+        error: []
     };
     try {
         if(body.maxDepth > process.env.MAX_DEPTH_LIMIT){
-            res.error = "Max Depth Excceeded";
+            res.error.push("Max Depth Excceeded");
             return res;
         }
         res.maxDepth = body.maxDepth;
-        
         if(body.maxPage > process.env.MAX_PAGE_LIMIT){
-            res.error = "Max Page Excceeded";
+            res.error.push("Max Page Excceeded");
             return res;
         }
         res.maxPage = body.maxPage;
-        console.log(body, RegExp(URL_REGEX).test(body.url));
-        if(!RegExp(URL_REGEX).test(body.url)){
-            res.error = "URL is not valid";
+        if(!RegExp(URL_REGEX).test(body.uri)){
+            res.error.push("URL is not valid");
             return res;
         }
-        res.url = body.url;
+        res.url =  RegExp(URL_REGEX).exec(body.uri)[0];
 
     } catch (error) {
         res.error = error;
@@ -46,13 +43,13 @@ export default async (req, res) => {
     const body = JSON.parse(req.body);
     if (req.method === 'POST') {
         let validRequest = isValid(req.body);
-        if (!validRequest.valid) {
+        if (validRequest.error.length > 0) {
             return res.status(400).json({
                 ok: false,
                 error: "Error Parsing request " + validRequest.error
             })
         }
         //save to queue
-        res.status(200);
+        return res.status(200).json(JSON.stringify(validRequest));
     }
 }

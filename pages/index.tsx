@@ -15,7 +15,7 @@ async function fetcher(path) {
 }
 
 async function crawl(path){
-  const data = {url: path,  maxDepth: 10};
+  const data = {uri: path,  maxDepth: 2, maxPage: 3};
   const res = await fetch(API_URL+"crawl-request", {
     method: 'POST',
     body: JSON.stringify(data)
