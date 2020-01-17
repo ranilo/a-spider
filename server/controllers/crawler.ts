@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-unfetch';
 import { Guid } from "guid-typescript";
-
+import {write} from '../../lib/dbUtill'
 export const URL_REGEX = 'http.*://[^?]*'
 
 export interface ICrawlMessage {
@@ -16,20 +16,35 @@ const preformCrawl = async (request: ICrawlMessage): Promise<void> => {
         isCrawlNeeded(request)
             .then(() => {
                 extractLinks(request.url)
-                .then((links) => { console.log(links) })
-                //save results
+                    .then((links) => {
+                        saveCrawl(request, links)
+                            .then(_ => {
+                                console.log('saved', _);
+                            })
+                            .catch(err => reject(err));
+                    })
+                    .then(() => resolve())
+                    .catch(error => reject(error))
                 //add to queue childern
-                //await crawl(message.getContent()
-                .then(() => resolve())
             })
             .catch((err) => reject(err))
+    });
+}
+
+const saveCrawl = async (request:ICrawlMessage, links:any):Promise<void> => {
+    return new Promise((resolve, reject) => {
+        const data = {...request, links: links};
+        console.log(data);
+        write(data)
+        .then(()=> resolve())
+        .catch(e => reject(e))
     });
 }
 
 const isCrawlNeeded = async (request: ICrawlMessage): Promise<void> => {
     return new Promise((resolve, reject) => {
         console.log('needed?', request);
-        if(!request) return reject('crawl data is missing');
+        if (!request) return reject('crawl data is missing');
         if (request.currentDepth >= request.requestedDepth) {
             reject('crawl reached depth');
         }
