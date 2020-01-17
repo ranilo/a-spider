@@ -1,0 +1,11 @@
+{
+    "env":{
+        "MAX_DEPTH_LIMIT": "@max_depth_limit",
+        "MAX_PAGE_LIMIT": "@max_page_limit",
+        "QUEUE_USERNAME": "@queue_username",
+        "QUEUE_PASSWORD": "@queue_password",
+        "RABBIT_SERVER": "@rabbir_server",
+        "RABBIT_QUEUE_NAME": "@rabbit_queue_name",
+        "AMQPTS_LOGLEVEL": "@amqp_loglvel"
+    }
+}

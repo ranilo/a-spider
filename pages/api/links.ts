@@ -1,5 +1,4 @@
 import fetch from 'isomorphic-unfetch';
-import { parse } from 'node-html-parser';
 
 const links = async (request: RequestInfo): Promise<any> => {
     return new Promise((resolve, reject) => {
@@ -38,11 +37,6 @@ export default async (req, res) => {
             ok:true,
             path: body.path,
             links: await links(body.path)
-        })
-    } else {
-        res.status(404).json({
-            ok: false,
-            message: "method not found"
         })
     }
 }
