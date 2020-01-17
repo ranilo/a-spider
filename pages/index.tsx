@@ -1,6 +1,7 @@
 import fetch from 'unfetch'
 import { ICrawlRequest } from './api/crawl-request';
 import { useEffect, useState } from 'react';
+import CrawlOutcome from './crawlOutcome';
 
 const fetchInit = ((data) => {
   return {
@@ -36,7 +37,7 @@ function HomePage() {
   if (!data) return <div>loading...</div>
   return <div>
     <h1>loaded: {data.url}</h1>
-    <p>{data.crawlId}</p>
+    <CrawlOutcome crawlId={data.crawlId}/>
   </div>
 }
 

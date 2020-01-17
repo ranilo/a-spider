@@ -15,22 +15,19 @@ const write = async (data): Promise<void> => {
     });
 }
 
-const listen = async (crawlId): Promise<Array<any>> => {
-    return new Promise((resolve, reject) => {
-        try {
-            db.collection(CRAWL_COLLECTION).where("crawlId", "==", crawlId)
-                .onSnapshot(function (querySnapshot) {
-                    var crawls = [];
-                    querySnapshot.forEach(function (doc) {
-                        crawls.push(doc.data());
-                    });
-                    resolve(crawls);
-                });
-        } catch (err) {
-            console.log('error reading from db', err);
-            reject(err);
-        }
-    })
+const listen = async (crawlId, callback: Function) => {
+    try {
+        db.collection(CRAWL_COLLECTION)
+            .orderBy('currentDepth', 'asc')
+            .limit(100)
+            .where("crawlId", "==", crawlId)
+            .onSnapshot((querySnapshot) => {
+                console.log(querySnapshot);
+                callback(querySnapshot)
+            });
+    } catch (err) {
+        console.log('error reading from db', err);
+    }
 }
 
 

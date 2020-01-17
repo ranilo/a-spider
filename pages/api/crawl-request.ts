@@ -57,8 +57,6 @@ export default async (req, res) => {
         if (validRequest.error) {
             return res.status(400).json(validRequest);
         }
-        //save to queue
-        console.log('puhing', validRequest.data);
         send(JSON.stringify(validRequest.data));
         return res.status(200).json(validRequest);
     }
