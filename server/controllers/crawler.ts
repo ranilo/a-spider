@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-unfetch';
 import { Guid } from "guid-typescript";
 import { write, countPages } from '../../lib/dbUtill'
+import { send } from '../../lib/RabbitClient';
 export const URL_REGEX = 'http.*://[^?]*'
 
 export interface ICrawlMessage {
@@ -19,12 +20,34 @@ const preformCrawl = async (request: ICrawlMessage): Promise<void> => {
                     .then((links) => {
                         saveCrawl(request, links)
                             .catch(err => reject(err));
+                        crawlChildren(request, links)
+                            .then(() => { console.log('all done') })
+                            .catch((_) => console.log("didn't crawl children", _));
                     })
                     .then(() => resolve())
                     .catch(error => reject(error))
-                //add to queue childern
             })
             .catch((err) => reject(err))
+    });
+}
+
+const crawlChildren = async (request, links): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        try {
+            const linkData = {
+                currentDepth: request.currentDepth + 1,
+                requestedDepth: request.requestedDepth,
+                requestedPages: request.requestedPages,
+                crawlId: request.crawlId
+            }
+            links.forEach(link => {
+                send(JSON.stringify({ ...linkData, url: link.url }));
+            })
+            resolve();
+        } catch (err) {
+            console.log('error sending links to queue', err);
+            reject(err);
+        }
     });
 }
 
@@ -44,6 +67,7 @@ const isCrawlNeeded = async (request: ICrawlMessage): Promise<void> => {
         if (request.currentDepth >= request.requestedDepth) {
             reject('crawl reached depth');
         }
+        //todo: cache is needed here tooo....
         if (request.requestedPages >= countPages(request.crawlId)) {
             reject('crawl reachd page count');
         }
