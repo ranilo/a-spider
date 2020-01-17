@@ -23,7 +23,7 @@ const CrawlOutcome = (props) => {
 
     return <div>
         {crawls.map(crawl =>
-            <li key={crawl.id}>{crawl.url}</li>)}
+        <li key={crawl.id}>{crawl.currentDepth} {crawl.url}</li>)}
     </div>
 }
 
