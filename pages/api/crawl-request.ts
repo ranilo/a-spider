@@ -20,12 +20,12 @@ function isValid(body: any): CrawlRequest {
             res.error.push("Max Depth Excceeded");
             return res;
         }
-        res.maxDepth = body.maxDepth;
+        res.maxDepth = body.maxDepth || 0;
         if(body.maxPage > process.env.MAX_PAGE_LIMIT){
             res.error.push("Max Page Excceeded");
             return res;
         }
-        res.maxPage = body.maxPage;
+        res.maxPage = body.maxPage || 0;
         if(!RegExp(URL_REGEX).test(body.uri)){
             res.error.push("URL is not valid");
             return res;
