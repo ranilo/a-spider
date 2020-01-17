@@ -10,7 +10,7 @@ const CrawlOutcome = (props) => {
             const docs = [];
             if(!snapshot || snapshot.empty) return;
             snapshot.forEach(doc => {
-                docs.push(doc.data());
+                docs.push({...doc.data(), id: doc.ref.id });
             });
             console.log(docs);
             setCrawls(docs)

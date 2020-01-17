@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-unfetch';
 import { Guid } from "guid-typescript";
-import { write } from '../../lib/dbUtill'
+import { write, countPages } from '../../lib/dbUtill'
 export const URL_REGEX = 'http.*://[^?]*'
 
 export interface ICrawlMessage {
@@ -44,10 +44,10 @@ const isCrawlNeeded = async (request: ICrawlMessage): Promise<void> => {
         if (request.currentDepth >= request.requestedDepth) {
             reject('crawl reached depth');
         }
-        if (request.requestedPages >= 10) { // todo: get the number from db
+        if (request.requestedPages >= countPages(request.crawlId)) {
             reject('crawl reachd page count');
         }
-        //todo: validate this url was not crawled in this scan
+        //todo: validate this url was not crawled in this scan need cache!
         if (false) {
             reject(`already crawled on ${request.url}`);
         }

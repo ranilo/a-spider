@@ -13,7 +13,7 @@ const fetchInit = ((data) => {
 function HomePage() {
 
   const requestData: ICrawlRequest = {
-    uri: 'https://www.github.com/developit/unfetch/tree/master/packages/isomorphic-unfetch',
+    uri: 'http://raniandamir.weebly.com/1496149714931500-14891513149715081493151014971501',
     maxDepth: 1,
     maxPage: 0
   }
