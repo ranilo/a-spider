@@ -21,17 +21,21 @@ class RabbitClient {
     }
 }
 
-async function send(msg: Amqp.Message) {
-    this.connection.completeConfiguration()
-        .then(() => {
-            this.exchange.send(msg);
-        });
+async function send(msg: any): Promise<void> {
+    const message = new Amqp.Message(msg)
+    return new Promise<void>((resolve) => {
+        RabbitClient.getIstance().connection.completeConfiguration()
+            .then(() => {
+                RabbitClient.getIstance().exchange.send(message);
+                resolve();
+            });
+    });
 }
 
 async function consume(callback: (message) => any): Promise<void> {
     return new Promise<void>((resolve) => {
         console.info(`> waiting for completeConfiguration`);
-        
+
         RabbitClient.getIstance().connection.completeConfiguration()
             .then(() => {
                 console.info(`> listning for meesseges on queue`);

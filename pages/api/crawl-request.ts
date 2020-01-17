@@ -1,12 +1,13 @@
 // crawl-request.ts
+import { send } from '../../lib/RabbitClient'
+import { URL_REGEX } from '../../server/controllers/crawler';
+
 interface CrawlRequest {
     url: String,
     maxDepth: Number,
     maxPage: Number,
     error: Array<String>
 }
-
-const URL_REGEX = 'http.*://[^?]*'
 
 function isValid(body: any): CrawlRequest {
     let res = {
@@ -49,6 +50,7 @@ export default async (req, res) => {
             })
         }
         //save to queue
+        send(JSON.stringify(validRequest));
         return res.status(200).json(JSON.stringify(validRequest));
     }
 }

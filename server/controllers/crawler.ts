@@ -1,6 +1,21 @@
 import fetch from 'isomorphic-unfetch';
 
-const links = async (request: RequestInfo): Promise<any> => {
+export const URL_REGEX = 'http.*://[^?]*'
+
+const preformCrawl = async (request: any):Promise<void> => {
+    return new Promise((resolve, reject) => {
+        //validate if needed
+         extractLinks(request.url)
+        .then((links)=>{console.log(links)})
+            //save results
+      //add to queue childern
+      //await crawl(message.getContent()
+      .then(()=> resolve())
+      .catch((err) => reject(err))
+    })
+}
+
+const extractLinks = async (request: RequestInfo): Promise<void> => {
     return new Promise((resolve, reject) => {
         fetch(request)
             .then((response: any) => {
@@ -19,7 +34,7 @@ const links = async (request: RequestInfo): Promise<any> => {
                 let data: any = [];
                 aObject.forEach(a => {
                     //for simplify - only use full urls
-                    if (RegExp('^http').test(a.attributes.href)) {
+                    if (RegExp(URL_REGEX).test(a.attributes.href)) {
                         data.push({ url: a.attributes.href })
                     }
                 })
@@ -28,15 +43,4 @@ const links = async (request: RequestInfo): Promise<any> => {
             .catch((err: any) => reject(err));
     });
 };
-
-export default async (req, res) => {
-    const body = JSON.parse(req.body);
-    console.log('req path:', body.path)
-    if (req.method === 'POST') {
-        res.status(200).json({
-            ok:true,
-            path: body.path,
-            links: await links(body.path)
-        })
-    }
-}
+export {preformCrawl}
