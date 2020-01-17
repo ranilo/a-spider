@@ -28,7 +28,8 @@ app.prepare()
     console.info('attempt conncting rabbit');
     consume((message) => {
       preformCrawl(JSON.parse(message.getContent()))
-        .then(() => message.ack());
+        .catch(err => console.log('did not crawl:', err))
+        .finally(() => message.ack());
     })
   })
 

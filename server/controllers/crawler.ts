@@ -2,26 +2,52 @@ import fetch from 'isomorphic-unfetch';
 
 export const URL_REGEX = 'http.*://[^?]*'
 
-const preformCrawl = async (request: any):Promise<void> => {
+export interface ICrawlMessage {
+    url: string,
+    currentDepth: number,
+    requestedDepth: number,
+    requestedPages: number,
+    crawlId: any
+}
+
+const preformCrawl = async (request: ICrawlMessage): Promise<void> => {
     return new Promise((resolve, reject) => {
         //validate if needed
-         extractLinks(request.url)
-        .then((links)=>{console.log(links)})
+        isCrawlNeeded(request)
+            .then(() => {extractLinks(request.url)
+            .then((links) => { console.log(links) })
             //save results
-      //add to queue childern
-      //await crawl(message.getContent()
-      .then(()=> resolve())
-      .catch((err) => reject(err))
-    })
+            //add to queue childern
+            //await crawl(message.getContent()
+            .then(() => resolve())
+            })
+            .catch((err) => reject(err))
+    });
+}
+
+const isCrawlNeeded = async (request: ICrawlMessage): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        console.log('needed?', request);
+        if (request.currentDepth >= request.requestedDepth) {
+            reject('crawl reached depth');
+        }
+        if (request.requestedPages >= 10) { // todo: get the number from db
+            reject('crawl reachd page count');
+        }
+        //todo: validate this url was not crawled in this scan
+        if(false){
+            reject(`already crawled on ${request.url}`);
+        }
+        resolve();
+    });
 }
 
 const extractLinks = async (request: RequestInfo): Promise<void> => {
     return new Promise((resolve, reject) => {
         fetch(request)
             .then((response: any) => {
-                debugger
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    reject('Network response was not ok');
                 }
                 return response.text();
             })
@@ -38,9 +64,9 @@ const extractLinks = async (request: RequestInfo): Promise<void> => {
                         data.push({ url: a.attributes.href })
                     }
                 })
-                resolve( data );
+                resolve(data);
             })
             .catch((err: any) => reject(err));
     });
 };
-export {preformCrawl}
+export { preformCrawl }

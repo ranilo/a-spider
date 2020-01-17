@@ -1,37 +1,47 @@
 // crawl-request.ts
 import { send } from '../../lib/RabbitClient'
-import { URL_REGEX } from '../../server/controllers/crawler';
+import { URL_REGEX, ICrawlMessage } from '../../server/controllers/crawler';
 
-interface CrawlRequest {
-    url: String,
-    maxDepth: Number,
-    maxPage: Number,
+interface ICrawlResponse {
+    data: ICrawlMessage,
     error: Array<String>
 }
 
-function isValid(body: any): CrawlRequest {
+export interface ICrawlRequest {
+    maxDepth: number,
+    maxPage: number,
+    uri: string
+}
+
+function isValid(body: ICrawlRequest): ICrawlResponse {
     let res = {
-        maxDepth: 0,
-        maxPage: 0,
-        url: null,
+        data: {
+            url: null,
+            currentDepth: 0,
+            requestedDepth: 0,
+            requestedPages: 0,
+            crawlId: null
+        },
         error: []
     };
     try {
-        if(body.maxDepth > process.env.MAX_DEPTH_LIMIT){
+        
+        if(body.maxDepth > Number(process.env.MAX_DEPTH_LIMIT || isNegatve(body.maxDepth))){
             res.error.push("Max Depth Excceeded");
             return res;
         }
-        res.maxDepth = body.maxDepth || 0;
-        if(body.maxPage > process.env.MAX_PAGE_LIMIT){
+        res.data.requestedDepth = body.maxDepth || 0;
+        if(body.maxPage > Number(process.env.MAX_PAGE_LIMIT || isNegatve(body.maxPage))){
             res.error.push("Max Page Excceeded");
             return res;
         }
-        res.maxPage = body.maxPage || 0;
+        res.data.requestedPages = body.maxPage || 0;
         if(!RegExp(URL_REGEX).test(body.uri)){
             res.error.push("URL is not valid");
             return res;
         }
-        res.url =  RegExp(URL_REGEX).exec(body.uri)[0];
+        res.data.url =  RegExp(URL_REGEX).exec(body.uri)[0];
+        res.data.currentDepth = 0;
 
     } catch (error) {
         res.error = error;
@@ -50,7 +60,9 @@ export default async (req, res) => {
             })
         }
         //save to queue
-        send(JSON.stringify(validRequest));
+        send(JSON.stringify(validRequest.data));
         return res.status(200).json(JSON.stringify(validRequest));
     }
 }
+
+const isNegatve = ((num) => num <= 0);
