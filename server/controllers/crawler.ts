@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-unfetch';
+import { Guid } from "guid-typescript";
 
 export const URL_REGEX = 'http.*://[^?]*'
 
@@ -7,19 +8,19 @@ export interface ICrawlMessage {
     currentDepth: number,
     requestedDepth: number,
     requestedPages: number,
-    crawlId: any
+    crawlId: Guid
 }
 
 const preformCrawl = async (request: ICrawlMessage): Promise<void> => {
     return new Promise((resolve, reject) => {
-        //validate if needed
         isCrawlNeeded(request)
-            .then(() => {extractLinks(request.url)
-            .then((links) => { console.log(links) })
-            //save results
-            //add to queue childern
-            //await crawl(message.getContent()
-            .then(() => resolve())
+            .then(() => {
+                extractLinks(request.url)
+                .then((links) => { console.log(links) })
+                //save results
+                //add to queue childern
+                //await crawl(message.getContent()
+                .then(() => resolve())
             })
             .catch((err) => reject(err))
     });
@@ -28,6 +29,7 @@ const preformCrawl = async (request: ICrawlMessage): Promise<void> => {
 const isCrawlNeeded = async (request: ICrawlMessage): Promise<void> => {
     return new Promise((resolve, reject) => {
         console.log('needed?', request);
+        if(!request) return reject('crawl data is missing');
         if (request.currentDepth >= request.requestedDepth) {
             reject('crawl reached depth');
         }
@@ -35,7 +37,7 @@ const isCrawlNeeded = async (request: ICrawlMessage): Promise<void> => {
             reject('crawl reachd page count');
         }
         //todo: validate this url was not crawled in this scan
-        if(false){
+        if (false) {
             reject(`already crawled on ${request.url}`);
         }
         resolve();

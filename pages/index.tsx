@@ -1,6 +1,6 @@
 import fetch from 'unfetch'
-import useSWR from 'swr'
 import { ICrawlRequest } from './api/crawl-request';
+import { useEffect, useState } from 'react';
 
 const fetchInit = ((data) => {
   return {
@@ -10,28 +10,33 @@ const fetchInit = ((data) => {
 });
 
 function HomePage() {
-  const requestData:ICrawlRequest = {
+
+  const requestData: ICrawlRequest = {
     uri: 'https://www.github.com/developit/unfetch/tree/master/packages/isomorphic-unfetch',
-    maxDepth: 2,
+    maxDepth: 1,
     maxPage: 0
   }
-
-  const { data, error } = useSWR(
-    "/api/crawl-request",
-    url =>
-      fetch(url, fetchInit(requestData))
-        .then(_ => _.json())
-  );
-
-  if (error) return <div>failed to load </div>
-  if (!data) return <div>loading...</div>
-  if (!data.ok) {
-    return <div><p>{data.error}</p></div>
+  const [crawl, setCrawl] = useState({
+    data: null,
+    error: null
+  });
+  const getCrawl = async () => {
+    fetch("/api/crawl-request", fetchInit(requestData))
+      .then(_ => _.json())
+      .then(_ => setCrawl(_))
   }
+
+  useEffect(() => {
+    getCrawl();
+  }, []);
+
+  const { data, error } = crawl;
+
+  if (error) return <div>failed to load {error.msg}</div>
+  if (!data) return <div>loading...</div>
   return <div>
-    <h1>{data.path}</h1>
-    {data.links.map(link =>
-      <li>{link.url}</li>)}
+    <h1>loaded: {data.url}</h1>
+    <p>{data.crawlId}</p>
   </div>
 }
 
