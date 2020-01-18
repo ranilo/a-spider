@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { listen } from "../../../lib/dbUtill";
+import CrawlNode from "./crawlNode";
 
 const CrawlOutcome = (props) => {
 
@@ -8,23 +9,24 @@ const CrawlOutcome = (props) => {
     const getCrawls = (async (crawlId) => {
         listen(crawlId, (snapshot) => {
             const docs = [];
-            if(!snapshot || snapshot.empty) return;
+            if (!snapshot || snapshot.empty) return;
             snapshot.forEach(doc => {
-                docs.push({...doc.data(), id: doc.ref.id });
+                docs.push({ ...doc.data(), id: doc.ref.id });
             });
             setCrawls(docs)
         })
     })
 
     useEffect(() => {
-        if(props.crawl){
-        getCrawls(props.crawl.crawlId);
+        if (props.crawl) {
+            getCrawls(props.crawl.crawlId);
         }
     }, [props.crawl]);
 
     return <div>
         {crawls.map((crawl, i) =>
-        <li key={crawl.id}>{i}->{crawl.currentDepth} {crawl.url}</li>)}
+            <CrawlNode crawl={crawl} count={i} />
+        )}
     </div>
 }
 
