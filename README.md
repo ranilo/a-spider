@@ -13,7 +13,7 @@ My home test for ActiveFence :koala:
 
 
 ## stack
-* next.js (SSD, node)
+* next.js (SSR, node)
 * rabbitmq
 * fierstore (replacing the DB and the websocket)
 * typescript 
