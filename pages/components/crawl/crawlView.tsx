@@ -33,11 +33,8 @@ function CrawlView() {
 
   const { data, error } = crawlResponse;
 
-  // if (error) return <div>failed to load {error.msg}</div>
-  // if (!data) return <div>loading...</div>
-  console.log(error);
   return <div>
-    <CrawlForm setCrawl={requestDetails} />
+    <CrawlForm setCrawl={requestDetails} error={error} />
 
     <CrawlOutcome crawl={data} />
 
