@@ -8,7 +8,7 @@ const CrawlNode = ((props) => {
         <div>URL: {props.crawl.url}</div>
         <div>
         {props.crawl.links.map((link, i) =>
-        <li key={i}>{link.url}</li>)}
+        <li key={i+props.crawl.crawlId}>{link.url}</li>)}
         </div>
     </div>
 })
