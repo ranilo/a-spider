@@ -14,8 +14,8 @@ function HomePage() {
 
   const requestData: ICrawlRequest = {
     uri: 'http://raniandamir.weebly.com/',
-    maxDepth: 3,
-    maxPage: 1
+    maxDepth: 5,
+    maxPage: 2
   }
   const [crawl, setCrawl] = useState({
     data: null,

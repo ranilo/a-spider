@@ -19,10 +19,8 @@ const preformCrawl = async (request: ICrawlMessage): Promise<void> => {
             .then(() => {
                 extractLinks(request.url)
                     .then((links) => {
+                        pageCounter.getInstance().increment();
                         saveCrawl(request, links)
-                            .then(() => {
-                                pageCounter.getInstance().increment();
-                            })
                             .catch(err => reject(err));
                         crawlChildren(request, links)
                             .then(() => { console.log('all done') })
@@ -58,7 +56,6 @@ const crawlChildren = async (request, links): Promise<void> => {
 const saveCrawl = async (request: ICrawlMessage, links: any): Promise<void> => {
     return new Promise((resolve, reject) => {
         const data = { ...request, links: links };
-        console.log(data);
         write(data)
             .then(() => resolve())
             .catch(e => reject(e))
@@ -66,23 +63,26 @@ const saveCrawl = async (request: ICrawlMessage, links: any): Promise<void> => {
 }
 
 const isCrawlNeeded = async (request: ICrawlMessage): Promise<void> => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         if (!request) return reject('crawl data is missing');
+        
+        let pageCount;
+        await pageCounter.getInstance().count().then((s) => {
+            pageCount =  Number(s);
+        })
+        if (request.requestedPages <= pageCount) {
+            return reject('crawl reachd page count');
+        }
+
         if (request.currentDepth >= request.requestedDepth) {
-            reject('crawl reached depth');
+            return reject('crawl reached depth');
         }
-        //todo: cache is needed here tooo....
-        // if (request.requestedPages >= countPages(request.crawlId)) {
-        let pageCount = -1;
-        pageCounter.getInstance().count((s) => pageCount = Number(s))
-        if (request.requestedPages >= pageCount) {
-            reject('crawl reachd page count');
-        }
+
         //todo: validate this url was not crawled in this scan need cache!
         if (false) {
-            reject(`already crawled on ${request.url}`);
+            return reject(`already crawled on ${request.url}`);
         }
-        resolve();
+        return resolve();
     });
 }
 
