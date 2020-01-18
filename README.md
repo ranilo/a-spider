@@ -7,10 +7,11 @@ My home test for ActiveFence :koala:
 * fierstore (replacing the DB and the websocket)
 * typescript 
 * docker :whale:
+* redis
 
 ## build: 
 **npm run dev**
-~~docker-compose up~~ (see TODOS)
+docker-compose up (running redis and rabbit)
 
 ## links
 [lucid chart](https://www.lucidchart.com/invitations/accept/79cd6621-5e01-41fd-a73c-682706e5a71c)

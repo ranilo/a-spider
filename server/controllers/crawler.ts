@@ -1,7 +1,8 @@
 import fetch from 'isomorphic-unfetch';
 import { Guid } from "guid-typescript";
-import { write, countPages } from '../../lib/dbUtill'
+import { write } from '../../lib/dbUtill'
 import { send } from '../../lib/RabbitClient';
+import { pageCounter } from '../../lib/redisHandler';
 export const URL_REGEX = 'http.*://[^?]*'
 
 export interface ICrawlMessage {
@@ -19,6 +20,9 @@ const preformCrawl = async (request: ICrawlMessage): Promise<void> => {
                 extractLinks(request.url)
                     .then((links) => {
                         saveCrawl(request, links)
+                            .then(() => {
+                                pageCounter.getInstance().increment();
+                            })
                             .catch(err => reject(err));
                         crawlChildren(request, links)
                             .then(() => { console.log('all done') })
@@ -68,7 +72,10 @@ const isCrawlNeeded = async (request: ICrawlMessage): Promise<void> => {
             reject('crawl reached depth');
         }
         //todo: cache is needed here tooo....
-        if (request.requestedPages >= countPages(request.crawlId)) {
+        // if (request.requestedPages >= countPages(request.crawlId)) {
+        let pageCount = -1;
+        pageCounter.getInstance().count((s) => pageCount = Number(s))
+        if (request.requestedPages >= pageCount) {
             reject('crawl reachd page count');
         }
         //todo: validate this url was not crawled in this scan need cache!

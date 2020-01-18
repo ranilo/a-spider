@@ -6,6 +6,8 @@
         "QUEUE_PASSWORD": "@queue_password",
         "RABBIT_SERVER": "@rabbir_server",
         "RABBIT_QUEUE_NAME": "@rabbit_queue_name",
-        "AMQPTS_LOGLEVEL": "@amqp_loglvel"
+        "AMQPTS_LOGLEVEL": "@amqp_loglvel",
+        "REDIS_HOST": "@redis_host",
+        "REDIS_PORT": "@redis_port"
     }
 }

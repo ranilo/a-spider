@@ -14,6 +14,7 @@
         "typescript": "^3.7.4"
     },
     "dependencies": {
+        "@types/redis": "^2.8.14",
         "amqp-ts": "^1.8.0",
         "dotenv": "^8.2.0",
         "firebase": "^7.7.0",
