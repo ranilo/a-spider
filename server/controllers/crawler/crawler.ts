@@ -1,8 +1,8 @@
 import fetch from 'isomorphic-unfetch';
 import { Guid } from "guid-typescript";
-import { write } from '../../lib/dbUtill'
-import { send } from '../../lib/RabbitClient';
-import { pageCounter, ViewdLinks } from '../../lib/redisHandler';
+import { write } from '../../../lib/dbUtill'
+import { send } from '../../../lib/RabbitClient';
+import { isCrawlNeeded } from './checkNeeded';
 export const URL_REGEX = 'http[^?#]*'
 
 export interface ICrawlMessage {
@@ -60,34 +60,6 @@ const saveCrawl = async (request: ICrawlMessage, links: any): Promise<void> => {
     });
 }
 
-const isCrawlNeeded = async (request: ICrawlMessage): Promise<void> => {
-    return new Promise(async (resolve, reject) => {
-        if (!request) return reject('crawl data is missing');
-
-        await isPageCountReached(request.requestedPages)
-            .then((exccded) => {
-                if (exccded) {
-                    reject('crawl reachd page count');
-                }
-            })
-            .catch((err) => reject(err));
-
-        if (request.currentDepth >= request.requestedDepth) {
-            return reject('crawl reached depth');
-        }
-
-        let alreadyVisited;
-        await ViewdLinks.getInstance().wasViewd(request.url)
-            .then((visit) => {
-                alreadyVisited = visit;
-            })
-        if (alreadyVisited) {
-            return reject(`already crawled on ${request.url}`);
-        }
-        await ViewdLinks.getInstance().add(request.url);
-        return resolve();
-    });
-}
 
 const extractLinks = async (request: RequestInfo): Promise<void> => {
     return new Promise((resolve, reject) => {
@@ -117,12 +89,4 @@ const extractLinks = async (request: RequestInfo): Promise<void> => {
     });
 };
 
-const isPageCountReached = (async (requestedPages) => {
-    let num;
-    await pageCounter.getInstance().countAndInc()
-        .then((s) => {
-            num = Number(s);
-        })
-    return requestedPages < num;
-})
 export { preformCrawl }

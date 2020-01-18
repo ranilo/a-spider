@@ -1,6 +1,6 @@
 // crawl-request.ts
 import { send } from '../../lib/RabbitClient'
-import { URL_REGEX, ICrawlMessage } from '../../server/controllers/crawler';
+import { URL_REGEX, ICrawlMessage } from '../../server/controllers/crawler/crawler';
 import { Guid } from "guid-typescript";
 
 interface ICrawlResponse {
