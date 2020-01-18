@@ -2,8 +2,8 @@ import fetch from 'isomorphic-unfetch';
 import { Guid } from "guid-typescript";
 import { write } from '../../lib/dbUtill'
 import { send } from '../../lib/RabbitClient';
-import { pageCounter } from '../../lib/redisHandler';
-export const URL_REGEX = 'http.*://[^?]*'
+import { pageCounter, ViewdLinks } from '../../lib/redisHandler';
+export const URL_REGEX = 'http[^?#]*'
 
 export interface ICrawlMessage {
     url: string,
@@ -19,12 +19,10 @@ const preformCrawl = async (request: ICrawlMessage): Promise<void> => {
             .then(() => {
                 extractLinks(request.url)
                     .then((links) => {
-                        pageCounter.getInstance().increment();
                         saveCrawl(request, links)
                             .catch(err => reject(err));
                         crawlChildren(request, links)
                             .then(() => { console.log('all done') })
-                            .catch((_) => console.log("didn't crawl children", _));
                     })
                     .then(() => resolve())
                     .catch(error => reject(error))
@@ -42,10 +40,10 @@ const crawlChildren = async (request, links): Promise<void> => {
                 requestedPages: request.requestedPages,
                 crawlId: request.crawlId
             }
-            links.forEach(link => {
+            links.forEach(async link => {
                 send(JSON.stringify({ ...linkData, url: link.url }));
+                resolve();
             })
-            resolve();
         } catch (err) {
             console.log('error sending links to queue', err);
             reject(err);
@@ -65,23 +63,28 @@ const saveCrawl = async (request: ICrawlMessage, links: any): Promise<void> => {
 const isCrawlNeeded = async (request: ICrawlMessage): Promise<void> => {
     return new Promise(async (resolve, reject) => {
         if (!request) return reject('crawl data is missing');
-        
-        let pageCount;
-        await pageCounter.getInstance().count().then((s) => {
-            pageCount =  Number(s);
-        })
-        if (request.requestedPages <= pageCount) {
-            return reject('crawl reachd page count');
-        }
+
+        await isPageCountReached(request.requestedPages)
+            .then((exccded) => {
+                if (exccded) {
+                    reject('crawl reachd page count');
+                }
+            })
+            .catch((err) => reject(err));
 
         if (request.currentDepth >= request.requestedDepth) {
             return reject('crawl reached depth');
         }
 
-        //todo: validate this url was not crawled in this scan need cache!
-        if (false) {
+        let alreadyVisited;
+        await ViewdLinks.getInstance().wasViewd(request.url)
+            .then((visit) => {
+                alreadyVisited = visit;
+            })
+        if (alreadyVisited) {
             return reject(`already crawled on ${request.url}`);
         }
+        await ViewdLinks.getInstance().add(request.url);
         return resolve();
     });
 }
@@ -105,7 +108,7 @@ const extractLinks = async (request: RequestInfo): Promise<void> => {
                 aObject.forEach(a => {
                     //for simplify - only use full urls
                     if (RegExp(URL_REGEX).test(a.attributes.href)) {
-                        data.push({ url: a.attributes.href })
+                        data.push({ url: RegExp(URL_REGEX).exec(a.attributes.href)[0] })
                     }
                 })
                 resolve(data);
@@ -113,4 +116,13 @@ const extractLinks = async (request: RequestInfo): Promise<void> => {
             .catch((err: any) => reject(err));
     });
 };
+
+const isPageCountReached = (async (requestedPages) => {
+    let num;
+    await pageCounter.getInstance().countAndInc()
+        .then((s) => {
+            num = Number(s);
+        })
+    return requestedPages < num;
+})
 export { preformCrawl }

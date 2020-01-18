@@ -13,9 +13,9 @@ const fetchInit = ((data) => {
 function HomePage() {
 
   const requestData: ICrawlRequest = {
-    uri: 'http://raniandamir.weebly.com/',
-    maxDepth: 5,
-    maxPage: 2
+    uri: 'https://raniandamir.weebly.com/1496149714931500-14891513149715081493151014971501',
+    maxDepth: 4,
+    maxPage: 10
   }
   const [crawl, setCrawl] = useState({
     data: null,

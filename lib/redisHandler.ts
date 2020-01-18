@@ -1,13 +1,14 @@
 import { createClient, RedisClient } from 'redis'
 
+const client: RedisClient = createClient(process.env.REDIS_PORT);
+
 class pageCounter {
     private counterName = 'page_counter';
 
-    private client: RedisClient;
     static _instance: pageCounter;
     private constructor() {
-        this.client = createClient(process.env.REDIS_PORT);
-        this.client.set(this.counterName, '0');
+
+        client.set(this.counterName, '0');
     }
     static getInstance() {
         if (!this._instance) {
@@ -15,13 +16,10 @@ class pageCounter {
         }
         return this._instance;
     }
-    increment() {
-        this.client.incr(this.counterName);
-    }
 
-    async count(): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            this.client.get(this.counterName, (err, value) => {
+    async countAndInc(): Promise<Number> {
+        return new Promise<Number>((resolve, reject) => {
+            client.incr(this.counterName, (err, value) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -33,5 +31,29 @@ class pageCounter {
 }
 
 export { pageCounter }
+
+class ViewdLinks {
+    static _instance: ViewdLinks;
+    static getInstance() {
+        if (!this._instance) {
+            this._instance = new ViewdLinks();
+        }
+        return this._instance;
+    }
+
+    async add(link: String) {
+        await client.set(link.toString(), link.toString(), 'EX', 1);
+    }
+
+    async wasViewd(link: String): Promise<Boolean> {
+        return new Promise<Boolean>((resolve, reject) => {
+            client.exists(link.toString(), (err, value) => {
+                if (err) reject(err)
+                else resolve(value == 1);
+            })
+        })
+    }
+}
+export { ViewdLinks }
 
 
