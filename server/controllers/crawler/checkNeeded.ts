@@ -11,16 +11,13 @@ const isCrawlNeeded = async (request: ICrawlMessage): Promise<void> => {
         if (request.currentDepth > request.requestedDepth) {
             return reject('crawl reached depth');
         }
-        console.log('will chack for ', request.url);
         await viewdPage(request.crawlId, request.url)
             .then(async (alreadyVisited) => {
-                console.log(request.url, 'visited', alreadyVisited);
                 if (alreadyVisited) {
                     reject(`already crawled on ${request.url}`);
                 } else {
                     await countPagesAndInc(request.crawlId)
                         .then((num) => {
-                            console.log(request.url, 'page count', request.requestedPages <= num);
                             if (request.requestedPages < num) {
                                 reject('crawl reachd page count');
                             }

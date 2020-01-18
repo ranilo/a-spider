@@ -22,7 +22,6 @@ const listen = async (crawlId, callback: Function) => {
             .limit(100)
             .where("crawlId", "==", crawlId)
             .onSnapshot((querySnapshot) => {
-                console.log(querySnapshot);
                 callback(querySnapshot)
             });
     } catch (err) {
@@ -30,19 +29,5 @@ const listen = async (crawlId, callback: Function) => {
     }
 }
 
-const countPages = (crawlId): any => {
-    try {
-        db.collection(CRAWL_COLLECTION)
-            .limit(1000)
-            .where("crawlId", "==", crawlId)
-            .get().then((querySnapshot) => {
-                return querySnapshot.size;
-            });
-    } catch (err) {
-        console.log('error reading from db', err);
-    }
-}
-
-export { countPages }
 export { listen }
 export { write }
