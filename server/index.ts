@@ -32,15 +32,3 @@ app.prepare()
         .finally(() => message.ack());
     })
   })
-
-  // async function crawl(path: any){
-  //   const data = {uri: path,  maxDepth: 2, maxPage: 3};
-  //   const res = await fetch(API_URL+"crawl-request", {
-  //     method: 'POST',
-  //     body: JSON.stringify(data)
-  //   })
-  //   // if(res.status != (200 || 422)){
-  //   const json = await res.json();
-  //   console.log(`crawl resoult ${json}`);
-  //   return json;
-  // }
