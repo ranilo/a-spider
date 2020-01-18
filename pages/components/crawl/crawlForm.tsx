@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 interface IcrawlForm {
   url: string,
   maxDepth: string,
-  maxPages: string
+  maxPage: string
 }
 const CrawlForm = ((props) => {
   const urlRef = useRef(null);
@@ -21,7 +21,7 @@ const CrawlForm = ((props) => {
   const errorsInitState = {
     url: '',
     maxDepth: '',
-    maxPages: ''
+    maxPage: ''
   }
 
   const [errors, setErrors] = useState(errorsInitState);
@@ -35,7 +35,7 @@ const CrawlForm = ((props) => {
     setValues({...values, maxDepth: e.target.value});
   })
   const changedPages=((e)=> {
-    setValues({...values, maxPages: e.target.value});
+    setValues({...values, maxPage: e.target.value});
   })
 
   const validateUrl = ((url)=>{
@@ -50,17 +50,17 @@ const CrawlForm = ((props) => {
       const errors = {
         url: '',
         maxDepth: '',
-        maxPages: ''
+        maxPage: ''
       };
       errors.url = validateUrl(values.url);
      
       if (values.maxDepth.length <= 0) errors.maxDepth = 'Required!'
       else if (values.maxDepth > maxDepthLimit) errors.maxDepth = 'max dept exceeds limit ' + maxDepthLimit;
 
-      if (values.maxPages.length <= 0) errors.maxPages = 'Required!'
-      else if (values.maxPages > maxPageLimit) errors.maxPages = 'max pages exceeds limit ' + maxPageLimit;
+      if (values.maxPage.length <= 0) errors.maxPage = 'Required!'
+      else if (values.maxPage > maxPageLimit) errors.maxPage = 'max pages exceeds limit ' + maxPageLimit;
 
-      if (errors.url || errors.maxDepth || errors.maxPages) {
+      if (errors.url || errors.maxDepth || errors.maxPage) {
         reject(errors)
       }
       else {
@@ -105,12 +105,12 @@ const CrawlForm = ((props) => {
     <br />
     <label>Max page for crawl:
     <input className='max_page'
-        value={values.maxPages}
+        value={values.maxPage}
         placeholder={maxPageLimitMsg}
         ref={maxPagesRef}
         disabled={isSubmitting}
         onChange={changedPages}
-      /><label className='errors'>{errors.maxPages}</label>
+      /><label className='errors'>{errors.maxPage}</label>
     </label>
     <br />
     <button className='submit'

@@ -11,10 +11,11 @@ interface ICrawlResponse {
 export interface ICrawlRequest {
     maxDepth: number,
     maxPage: number,
-    uri: string
+    url: string
 }
 
 function isValid(body: ICrawlRequest): ICrawlResponse {
+    console.log(body);
     let res = {
         data: {
             url: null,
@@ -27,20 +28,20 @@ function isValid(body: ICrawlRequest): ICrawlResponse {
     };
     try {
         if (body.maxDepth > Number(process.env.MAX_DEPTH_LIMIT) || isNegatve(body.maxDepth)) {
-            res.error = { "msg": "Max Depth Excceeded"};
+            res.error = { "msg": "Max Depth Excceeded" };
             return res;
         }
         res.data.requestedDepth = body.maxDepth || 0;
         if (body.maxPage > Number(process.env.MAX_PAGE_LIMIT) || isNegatve(body.maxPage)) {
-            res.error = { "msg":"Max Page Excceeded"};
+            res.error = { "msg": "Max Page Excceeded" };
             return res;
         }
         res.data.requestedPages = body.maxPage || 0;
-        if (!RegExp(URL_REGEX).test(body.uri)) {
-            res.error = { "msg":"URL is not valid"};
+        if (!RegExp(URL_REGEX).test(body.url)) {
+            res.error = { "msg": "URL is not valid" };
             return res;
         }
-        res.data.url = RegExp(URL_REGEX).exec(body.uri)[0];
+        res.data.url = RegExp(URL_REGEX).exec(body.url)[0];
         res.data.currentDepth = 0;
         res.data.crawlId = Guid.raw();
 

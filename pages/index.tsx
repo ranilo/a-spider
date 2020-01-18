@@ -1,20 +1,10 @@
 
-import React, { useState } from 'react'
-import CrawlForm from './components/crawl/crawlForm'
+import React  from 'react'
 import CrawlView from './components/crawl/crawlView'
 
 const homePage = (() => {
-const [crawl, setCrawl] = useState({})
-
-const callback = (values) => {
-    setCrawl( {
-        ...crawl, values
-    })
-}
-
     return <div>
-        <CrawlForm setCrawl={callback} />
-        <CrawlView crawl={crawl} />
+        <CrawlView />
         <style jsx>{``}</style>
     </div>
 })

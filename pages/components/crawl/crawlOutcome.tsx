@@ -12,14 +12,15 @@ const CrawlOutcome = (props) => {
             snapshot.forEach(doc => {
                 docs.push({...doc.data(), id: doc.ref.id });
             });
-            console.log(docs);
             setCrawls(docs)
         })
     })
 
     useEffect(() => {
-        getCrawls(props.crawlId);
-    }, []);
+        if(props.crawl){
+        getCrawls(props.crawl.crawlId);
+        }
+    }, [props.crawl]);
 
     return <div>
         {crawls.map((crawl, i) =>
