@@ -1,44 +1,49 @@
-import fetch from 'unfetch'
-import { ICrawlRequest } from './api/crawl-request';
-import { useEffect, useState } from 'react';
-import CrawlOutcome from './crawlOutcome';
+import { useRef } from "react";
 
-const fetchInit = ((data) => {
-  return {
-    method: 'POST',
-    body: JSON.stringify(data)
-  }
-});
 
-function HomePage() {
+const crawlForm = (() => {
+  const url = useRef(null);
+  const maxDepth = useRef(null);
+  const maxPages = useRef(null);
 
-  const requestData: ICrawlRequest = {
-    uri: 'https://redis.io/commands/expire',
-    maxDepth: 3,
-    maxPage: 6
-  }
-  const [crawl, setCrawl] = useState({
-    data: null,
-    error: null
-  });
-  const getCrawl = async () => {
-    fetch("/api/crawl-request", fetchInit(requestData))
-      .then(_ => _.json())
-      .then(_ => setCrawl(_))
-  }
+  const maxDepthLimit = 'Max: '+process.env.MAX_DEPTH_LIMIT;
+  const maxPageLimit = 'Max: '+process.env.MAX_PAGE_LIMIT;
 
-  useEffect(() => {
-    getCrawl();
-  }, []);
+  const validateAndSubmit = (() => {
 
-  const { data, error } = crawl;
+  })
+  return <form>
+    <label>
+      Url to crawl:
+    <input className='url'
+        placeholder="your url"
+        ref={url}
+        defaultValue={''} />
+    </label>
+    <br />
+    <label>Max depth for crawl:
+    <input className='max_depth'
+        placeholder={maxDepthLimit}
+        ref={maxDepth}
+      />
+    </label>
+    <br />
+    <label>Max page for crawl:
+    <input className='max_page'
+        placeholder={maxPageLimit}
+        ref={maxPages}
+      />
+    </label>
+    <br />
+    <button className='submit'
+      onClick={validateAndSubmit}
+    >Start crawling</button>
 
-  if (error) return <div>failed to load {error.msg}</div>
-  if (!data) return <div>loading...</div>
-  return <div>
-    <h1>loaded: {data.url}</h1>
-    <CrawlOutcome crawlId={data.crawlId}/>
-  </div>
-}
 
-export default HomePage
+    <style jsx>{``}</style>
+
+  </form >
+
+})
+
+export default crawlForm
