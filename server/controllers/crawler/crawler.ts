@@ -1,8 +1,9 @@
 import fetch from 'isomorphic-unfetch';
 import { Guid } from "guid-typescript";
-import { write, countPages } from '../../lib/dbUtill'
-import { send } from '../../lib/RabbitClient';
-export const URL_REGEX = 'http.*://[^?]*'
+import { write } from '../../../lib/dbUtill'
+import { send } from '../../../lib/RabbitClient';
+import { isCrawlNeeded } from './checkNeeded';
+export const URL_REGEX = 'http[^?#]*'
 
 export interface ICrawlMessage {
     url: string,
@@ -22,7 +23,6 @@ const preformCrawl = async (request: ICrawlMessage): Promise<void> => {
                             .catch(err => reject(err));
                         crawlChildren(request, links)
                             .then(() => { console.log('all done') })
-                            .catch((_) => console.log("didn't crawl children", _));
                     })
                     .then(() => resolve())
                     .catch(error => reject(error))
@@ -40,10 +40,10 @@ const crawlChildren = async (request, links): Promise<void> => {
                 requestedPages: request.requestedPages,
                 crawlId: request.crawlId
             }
-            links.forEach(link => {
+            links.forEach(async link => {
                 send(JSON.stringify({ ...linkData, url: link.url }));
+                resolve();
             })
-            resolve();
         } catch (err) {
             console.log('error sending links to queue', err);
             reject(err);
@@ -54,30 +54,12 @@ const crawlChildren = async (request, links): Promise<void> => {
 const saveCrawl = async (request: ICrawlMessage, links: any): Promise<void> => {
     return new Promise((resolve, reject) => {
         const data = { ...request, links: links };
-        console.log(data);
         write(data)
             .then(() => resolve())
             .catch(e => reject(e))
     });
 }
 
-const isCrawlNeeded = async (request: ICrawlMessage): Promise<void> => {
-    return new Promise((resolve, reject) => {
-        if (!request) return reject('crawl data is missing');
-        if (request.currentDepth >= request.requestedDepth) {
-            reject('crawl reached depth');
-        }
-        //todo: cache is needed here tooo....
-        if (request.requestedPages >= countPages(request.crawlId)) {
-            reject('crawl reachd page count');
-        }
-        //todo: validate this url was not crawled in this scan need cache!
-        if (false) {
-            reject(`already crawled on ${request.url}`);
-        }
-        resolve();
-    });
-}
 
 const extractLinks = async (request: RequestInfo): Promise<void> => {
     return new Promise((resolve, reject) => {
@@ -98,7 +80,7 @@ const extractLinks = async (request: RequestInfo): Promise<void> => {
                 aObject.forEach(a => {
                     //for simplify - only use full urls
                     if (RegExp(URL_REGEX).test(a.attributes.href)) {
-                        data.push({ url: a.attributes.href })
+                        data.push({ url: RegExp(URL_REGEX).exec(a.attributes.href)[0] })
                     }
                 })
                 resolve(data);
@@ -106,4 +88,5 @@ const extractLinks = async (request: RequestInfo): Promise<void> => {
             .catch((err: any) => reject(err));
     });
 };
+
 export { preformCrawl }

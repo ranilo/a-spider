@@ -13,9 +13,9 @@ const fetchInit = ((data) => {
 function HomePage() {
 
   const requestData: ICrawlRequest = {
-    uri: 'http://raniandamir.weebly.com/',
+    uri: 'https://redis.io/commands/expire',
     maxDepth: 3,
-    maxPage: 1
+    maxPage: 6
   }
   const [crawl, setCrawl] = useState({
     data: null,

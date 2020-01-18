@@ -2,7 +2,7 @@ import { createServer } from 'http'
 import { parse } from 'url'
 import next from 'next'
 import { consume } from '../lib/RabbitClient'
-import { preformCrawl } from './controllers/crawler'
+import { preformCrawl } from './controllers/crawler/crawler'
 
 const port = parseInt(process.env.PORT || '3000', 10)
 const dev = process.env.NODE_ENV !== 'production'
