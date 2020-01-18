@@ -1,6 +1,6 @@
 
+import React from 'react'
 import fetch from 'unfetch'
-import { ICrawlRequest } from '../../api/crawl-request';
 import { useEffect, useState } from 'react';
 import CrawlOutcome from './crawlOutcome';
 
@@ -11,25 +11,20 @@ const fetchInit = ((data) => {
   }
 });
 
-function newCrawl() {
+function CrawlView(props) {
 
-  const requestData: ICrawlRequest = {
-    uri: '',
-    maxDepth: 0,
-    maxPage: 0
-  }
   const [crawl, setCrawl] = useState({
     data: null,
     error: null
   });
-  const getCrawl = async () => {
+  const getCrawl = async (requestData) => {
     fetch("/api/crawl-request", fetchInit(requestData))
       .then(_ => _.json())
       .then(_ => setCrawl(_))
   }
 
   useEffect(() => {
-    getCrawl();
+    getCrawl(props.crawl);
   }, []);
 
   const { data, error } = crawl;
@@ -41,4 +36,4 @@ function newCrawl() {
     <CrawlOutcome crawlId={data.crawlId}/>
   </div>
 }
-export default newCrawl
+export default CrawlView

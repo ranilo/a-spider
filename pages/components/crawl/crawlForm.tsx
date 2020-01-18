@@ -6,7 +6,7 @@ interface IcrawlForm {
   maxDepth: string,
   maxPages: string
 }
-const CrawlForm = (() => {
+const CrawlForm = ((props) => {
   const urlRef = useRef(null);
   const maxDepthRef = useRef(null);
   const maxPagesRef = useRef(null);
@@ -73,7 +73,7 @@ const CrawlForm = (() => {
     setErrors(errorsInitState);
     validateErrors(values)
       .then(() => {
-        console.log('submitting...');
+        props.setCrawl(values);
         setIsSubmitting(true)
       })
       .catch((error) => {
