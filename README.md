@@ -28,6 +28,6 @@ docker-compose up (running redis and rabbit)
 [lucid chart](https://www.lucidchart.com/invitations/accept/79cd6621-5e01-41fd-a73c-682706e5a71c)
 
 ## TODOS:
-* becouse of mextjs and .env, When running with docker compose the worker is not connecting to queue.
+* becouse of nextjs and .env, When running with docker compose the worker is not connecting to queue.
 * jest and puppeteer
 * css - it's ugly!
